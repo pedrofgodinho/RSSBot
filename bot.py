@@ -152,12 +152,12 @@ async def on_message(message):
                 return
             elif command == 'cheat': # TEMP
                 for watched in guilds[guild_id].watching:
-                    guilds[guild_id].watching[watched].feed = guilds[guild_id].watching[watched].feed[:-1]
+                    guilds[guild_id].watching[watched].feed_size = max(0, guilds[guild_id].watching[watched].feed_size - 1)
                 return
             elif command == 'status':
                 to_send = 'Status:'
                 for watched in guilds[guild_id].watching:
-                    to_send += f'\n{get(message.guild.roles, id=watched).mention} is watching {guilds[guild_id].watching[watched].url} (currently {len(guilds[guild_id].watching[watched].feed)} entries)'
+                    to_send += f'\n{get(message.guild.roles, id=watched).mention} is watching {guilds[guild_id].watching[watched].url} (currently {guilds[guild_id].watching[watched].feed_size} entries)'
                 await message.channel.send(to_send)
                 return
             else:

@@ -4,7 +4,7 @@ class ManagedFeed:
     def __init__(self, url):
         self.url = url
         try:
-            self.feed = sorted(feedparser.parse(url).entries[::-1], key=lambda k: k['published_parsed'])
+            self.feed_size = len(sorted(feedparser.parse(url).entries[::-1], key=lambda k: k['published_parsed']))
         except:
             raise ValueError("Invalid URL")
     
@@ -13,8 +13,8 @@ class ManagedFeed:
             new_feed = sorted(feedparser.parse(self.url).entries[::-1], key=lambda k: k['published_parsed'])
         except:
             return []
-        size_diff = len(new_feed) - len(self.feed)
-        self.feed = new_feed
+        size_diff = len(new_feed) - self.feed_size
+        self.feed_size = len(new_feed)
         if size_diff == 0:
             return []
         return new_feed[-size_diff:]
