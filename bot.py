@@ -98,11 +98,7 @@ async def on_message(message):
                     await message.channel.send('Not enough arguments. See !rss')
                     return
                 
-                # Create role if it doesn't exist
-                if not get(message.guild.roles, name=args[0]):
-                    await message.guild.create_role(name=args[0], colour=discord.Colour(random.randint(0, 0xffffff)))
-                    await message.channel.send(f'Created role {get(message.guild.roles, name=args[0]).mention}.')
-                
+                                
                 if not is_emoji(args[1]):
                     await message.channel.send('Second argument needs to be an emoji.')
                     return
@@ -110,10 +106,16 @@ async def on_message(message):
                 if args[1] in guilds[guild_id].watching_emoji.values():
                     await message.channel.send('Emoji already in use.')
                     return
-                
+
+                # Create role if it doesn't exist
+                if not get(message.guild.roles, name=args[0]):
+                    await message.guild.create_role(name=args[0], colour=discord.Colour(random.randint(0, 0xffffff)))
+                    await message.channel.send(f'Created role {get(message.guild.roles, name=args[0]).mention}.')
+
                 # Add feed to guild manager
                 if not guilds[guild_id].add_feed(get(message.guild.roles, name=args[0]).id, args[1], args[2]):
                     await message.channel.send(f'Could not add {args[2]}! Make sure it is a valid RSS feed url.')
+                    await get(message.guild.roles, name=args[0]).delete()
                     return
                 await message.channel.send(f'Assigned rss feed {args[2]} to {get(message.guild.roles, name=args[0]).mention}!')
 
@@ -208,7 +210,7 @@ async def on_raw_reaction_remove(payload):
             return
 
 
-@tasks.loop(minutes=0.1)
+@tasks.loop(minutes=5)
 async def update():
     changed = False
     for guild_id in guilds:
