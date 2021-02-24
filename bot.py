@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 # Keys are the guild id for each active guild, values are GuildManagers for them
 load_dotenv('.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
-print(TOKEN)
 guilds = {}
 client = discord.Client()
 
