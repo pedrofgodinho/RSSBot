@@ -1,3 +1,4 @@
+feedparser
 discord
 emoji
 python-dotenv
