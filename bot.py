@@ -215,7 +215,7 @@ async def on_raw_reaction_remove(payload):
 @tasks.loop(minutes=5)
 async def update():
     log('Updating...')
-    updates = 0
+    num_updates = 0
     changed = False
     for guild_id in guilds:
         if guilds[guild_id].notification_channel_id is not None:
@@ -223,7 +223,7 @@ async def update():
                 updates = guilds[guild_id].watching[role_id].update()
                 if updates:
                     updates += 1
-                    changed = True
+                    num_changed = True
                     for update in updates:
                         guild = client.get_guild(guild_id)
                         role = get(guild.roles, id=role_id)
@@ -240,7 +240,7 @@ async def update():
                             log(sys.exc_info()[0])
     if changed:
         save()
-    log(f'Found new messages in {updates} feeds.')
+    log(f'Found new messages in {num_updates} feeds.')
     log('Update Finished.')
 
 
