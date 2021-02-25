@@ -233,7 +233,7 @@ async def update():
                         )
                         try:
                             await guild.get_channel(guilds[guild_id].notification_channel_id).send(embed=embed)
-                        execpt:
+                        except:
                             print(f'Exception on {guild_id}')
                             print(sys.exc_info()[0])
     if changed:
