@@ -159,6 +159,9 @@ async def on_message(message):
                     to_send += f'\n{get(message.guild.roles, id=watched).mention} is watching {guilds[guild_id].watching[watched].url} (currently {len(guilds[guild_id].watching[watched].feed)} entries)'
                 await message.channel.send(to_send)
                 return
+            elif command == 'diff':
+                await findDifferences()
+                return
             else:
                 await message.channel.send(help_message)
                 return
@@ -210,12 +213,15 @@ async def on_raw_reaction_remove(payload):
 
 
 @tasks.loop(minutes=0.1)
-async def update():
+async def update(diff=false):
     changed = False
     for guild_id in guilds:
         if guilds[guild_id].notification_channel_id is not None:
             for role_id in guilds[guild_id].watching:
-                updates = guilds[guild_id].watching[role_id].update()
+                if(diff):
+                    updates = guilds[guild_id].watching[role_id].findDifferences()
+                else:
+                    updates = guilds[guild_id].watching[role_id].update()
                 if updates:
                     changed = True
                     for update in updates:
@@ -230,6 +236,9 @@ async def update():
                         await guild.get_channel(guilds[guild_id].notification_channel_id).send(embed=embed)
     if changed:
         save()
+
+async def findDifferences():
+    await update(true)
 
 
 async def change_subscription_channel(guild_manager, channel):
