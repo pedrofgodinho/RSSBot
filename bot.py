@@ -214,13 +214,15 @@ async def on_raw_reaction_remove(payload):
 
 @tasks.loop(minutes=5)
 async def update():
-    print(f'[{datetime.now().strftime("%H:%M:%S")}] Updating...')
+    log('Updating...')
+    updates = 0
     changed = False
     for guild_id in guilds:
         if guilds[guild_id].notification_channel_id is not None:
             for role_id in guilds[guild_id].watching:
                 updates = guilds[guild_id].watching[role_id].update()
                 if updates:
+                    updates += 1
                     changed = True
                     for update in updates:
                         guild = client.get_guild(guild_id)
@@ -234,11 +236,12 @@ async def update():
                         try:
                             await guild.get_channel(guilds[guild_id].notification_channel_id).send(content=role.mention, embed=embed)
                         except:
-                            print(f'Exception on {guild_id}')
-                            print(sys.exc_info()[0])
+                            log(f'Exception on guild with id {guild_id}')
+                            log(sys.exc_info()[0])
     if changed:
         save()
-    print('Update Finished')
+    log(f'Found new messages in {updates} feeds.')
+    log('Update Finished.')
 
 
 async def change_subscription_channel(guild_manager, channel):
@@ -282,6 +285,10 @@ def is_emoji(s):
 def save():
     with open('pickle', 'wb') as fd:
         pickle.dump(guilds, fd)
+
+
+def log(message):
+    print(f'[{datetime.now().strftime("%H:%M:%S")}] {message}')
 
 
 try:
