@@ -9,6 +9,8 @@ import pickle
 
 from emoji import UNICODE_EMOJI
 
+from datetime import datetime
+
 import os
 from dotenv import load_dotenv
 
@@ -212,6 +214,7 @@ async def on_raw_reaction_remove(payload):
 
 @tasks.loop(minutes=5)
 async def update():
+    print(f'[{datetime.now().strftime("%H:%M:%S")}] Updating...')
     changed = False
     for guild_id in guilds:
         if guilds[guild_id].notification_channel_id is not None:
@@ -228,9 +231,14 @@ async def update():
                             description=f'New update in {role.mention}.',
                             color=role.colour
                         )
-                        await guild.get_channel(guilds[guild_id].notification_channel_id).send(embed=embed)
+                        try:
+                            await guild.get_channel(guilds[guild_id].notification_channel_id).send(embed=embed)
+                        execpt:
+                            print(f'Exception on {guild_id}')
+                            print(sys.exc_info()[0])
     if changed:
         save()
+    print('Update Finished')
 
 
 async def change_subscription_channel(guild_manager, channel):

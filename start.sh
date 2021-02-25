@@ -1,0 +1,1 @@
+screen -dmS BotScreen bash -c "python3 bot.py"
