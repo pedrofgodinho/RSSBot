@@ -1,4 +1,5 @@
 from rssmanager import ManagedFeed
+from guild_manager import GuildManager
 
 import random
 
@@ -26,41 +27,6 @@ Usage:
 !rss remove <role name>
 !rss status
 '''
-
-# A class to each Guild's watched rss feeds
-class GuildManager:
-    def __init__(self, guild_id):
-        # The id of the guild
-        self.guild_id = guild_id
-        # The id of the management channel
-        self.management_channel_id = None
-        # The id of the message channel
-        self.notification_channel_id = None
-        # The id of the subscription channel
-        self.subscription_channel_id = None
-        # The id of the subscription message
-        self.subscription_message_id = None
-        # Watching keys are the role id and the value is the ManagedFeed being watched by that role
-        self.watching = {}
-        self.watching_emoji = {}
-    
-    def add_feed(self, role_id, emoji, url):
-        try:
-            feed = ManagedFeed(url)
-            self.watching[role_id] = feed
-            self.watching_emoji[role_id] = emoji
-            return True
-        except ValueError as e:
-            return False
-    
-
-    def has_feed(self, role_id):
-        return role_id in self.watching
-    
-
-    def remove_feed(self, role_id):
-        del self.watching[role_id]
-        del self.watching_emoji[role_id] 
 
 
 @client.event
@@ -182,6 +148,9 @@ async def on_message(message):
                 await message.channel.send('Using this channel as subscription channel!')
                 await change_subscription_channel(guilds[guild_id], message.channel)
                 save()
+                return
+            elif command == 'clean':
+                del guilds[guild_id]
                 return
             else:
                 await message.channel.send('Start by setting up a management channel with `!rss manage_here`. You should then setup a notifications server with `!rss notify_here` and a subscription channel with `!rss subscribe_here`.')
