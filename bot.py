@@ -191,8 +191,8 @@ async def update():
             for role_id in guilds[guild_id].watching:
                 updates = guilds[guild_id].watching[role_id].update()
                 if updates:
-                    updates += 1
-                    num_changed = True
+                    num_updates += 1
+                    changed = True
                     for update in updates:
                         guild = client.get_guild(guild_id)
                         role = get(guild.roles, id=role_id)
