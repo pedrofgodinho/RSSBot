@@ -186,8 +186,9 @@ async def update():
     num_updates = 0
     changed = False
     to_delete = []
+    current_guild_ids = [g.id for g in client.guilds]
     for guild_id in guilds:
-        if guild_id not in client.guilds:
+        if guild_id not in current_guild_ids:
             changed = True
             to_delete.append(guild_id)
         elif guilds[guild_id].notification_channel_id is not None:
