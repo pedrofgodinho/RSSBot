@@ -3,21 +3,21 @@ from typing import Dict
 
 class GuildManager:
     """A class that holds variables related to each guild the bot is on"""
-    guild_id: int = None
-    management_channel_id: int = None
-    notification_channel_id: int = None
-    subscription_channel_id: int = None
-    subscription_message_id: int = None
-    watching: Dict[id, ManagedFeed] = {}
-    watching_emoji: Dict[id, str] = {}
-
+    
     def __init__(self, guild_id: int):
         """ Initializes the class
 
         Args:
         guild_id -- The id of the guild this object manages
         """
-        self.guild_id = guild_id
+        self.guild_id: int = guild_id
+        self.management_channel_id: int = None
+        self.notification_channel_id: int = None
+        self.subscription_channel_id: int = None
+        self.subscription_message_id: int = None
+        self.watching: Dict[id, ManagedFeed] = {}
+        self.watching_emoji: Dict[id, str] = {}
+
     
     def add_feed(self, role_id: int, emoji: str, url: str) -> None:
         """Adds a feed to be watched by the server
