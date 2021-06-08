@@ -265,7 +265,7 @@ def save():
 
 
 def log(message):
-    print(f'[{datetime.now().strftime("%H:%M:%S")}] {message}')
+    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] {message}')
 
 
 try:
