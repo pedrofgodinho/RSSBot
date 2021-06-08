@@ -2,6 +2,7 @@ from rssmanager import ManagedFeed
 from guild_manager import GuildManager
 
 import random
+from typing import Dict
 
 import discord
 from discord.utils import get
@@ -15,10 +16,10 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
-# Keys are the guild id for each active guild, values are GuildManagers for them
 load_dotenv('.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
-guilds = {}
+# Keys are the guild id for each active guild, values are GuildManagers for them
+guilds: Dict[int, GuildManager] = {}
 client = discord.Client()
 
 help_message = '''
@@ -49,7 +50,6 @@ async def on_message(message):
 
     # Only listen to messages starting with !rss
     if message.content.startswith('!rss'):
-
         # Split arguments
         split = message.content.split(' ')
         if len(split) == 1:
@@ -65,7 +65,6 @@ async def on_message(message):
                 if len(args) < 3:
                     await message.channel.send('Not enough arguments. See !rss')
                     return
-                
                                 
                 if not is_emoji(args[1]):
                     await message.channel.send('Second argument needs to be an emoji.')
@@ -186,8 +185,12 @@ async def update():
     log('Updating...')
     num_updates = 0
     changed = False
+    to_delete = []
     for guild_id in guilds:
-        if guilds[guild_id].notification_channel_id is not None:
+        if guild_id not in client.guilds:
+            changed = True
+            to_delete.append(guild_id)
+        elif guilds[guild_id].notification_channel_id is not None:
             for role_id in guilds[guild_id].watching:
                 updates = guilds[guild_id].watching[role_id].update()
                 if updates:
@@ -207,8 +210,13 @@ async def update():
                         except:
                             log(f'Exception on guild with id {guild_id}')
                             log(sys.exc_info()[0])
+
+    for d in to_delete:
+        del guilds[d]
+
     if changed:
         save()
+
     log(f'Found new messages in {num_updates} feeds.')
     log('Update Finished.')
 
